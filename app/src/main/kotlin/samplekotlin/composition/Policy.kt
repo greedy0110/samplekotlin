@@ -1,44 +1,41 @@
-package samplekotlin.inheritied
+package samplekotlin.composition
 
+import samplekotlin.inheritied.Call
+import samplekotlin.inheritied.Money
 import java.time.Duration
 
-abstract class Phone {
-  private val calls = mutableListOf<Call>()
+// 기본정책과 부가정책을 포괄
+interface RatePolicy {
+  fun calculateFee(phone: Phone2): Money
+}
 
-  fun calculateFee(): Money {
-    var result = Money.EMPTY
-
-    for (call in calls) {
-      result += calculateCallFee(call)
+// 기본정책 구현, 상속 버전의 Phone과 매우 비슷하다.
+abstract class BaseRatePolicy : RatePolicy {
+  override fun calculateFee(phone: Phone2): Money {
+    val result = Money.ZERO
+    for (call in phone.calls) {
+      result + calculateCallFee(call)
     }
-
     return result
   }
 
-  protected open fun afterCalculated(fee: Money): Money {
-    return fee
-  }
-
-  protected abstract fun calculateCallFee(call: Call): Money
+  abstract fun calculateCallFee(call: Call): Money
 }
 
-// 부가정책은 적용하지 않고 기본 정책만을 요금계산하는 경우
-open class RegularPhone(
+class RegularPolicy(
   private val amount: Money,
   private val seconds: Duration,
-) : Phone() {
-
+) : BaseRatePolicy() {
   override fun calculateCallFee(call: Call): Money {
     return amount * (call.duration.seconds / seconds.seconds.toDouble())
   }
 }
 
-// 부가정책은 적용하지 않고 기본 정책만을 요금계산하는 경우
-open class NightlyDiscountPhone(
+class NightlyDiscountPolicy(
   private val nightlyAmount: Money,
   private val regularAmount: Money,
   private val seconds: Duration,
-) : Phone() {
+) : BaseRatePolicy() {
   override fun calculateCallFee(call: Call): Money {
     if (call.from.hour >= LATE_NIGHT_HOUR) {
       return nightlyAmount * (call.duration.seconds / seconds.seconds.toDouble())

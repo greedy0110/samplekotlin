@@ -16,7 +16,7 @@ class TaxableRegularPhone1(
   }
 }
 
-class TaxableRegularPhone2(
+open class TaxableRegularPhone2(
   private val amount: Money,
   private val seconds: Duration,
   private val taxRate: Double,

@@ -28,6 +28,7 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:31.1-jre")
+  testImplementation("junit:junit:4.13.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
